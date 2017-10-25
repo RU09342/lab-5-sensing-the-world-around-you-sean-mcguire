@@ -1,18 +1,97 @@
-# Visualizing Data
-In the next lab, we will start looking into how to take action on the information your microprocessor is receiving, for the last part of this lab, we will focus on visualizing the data. We will focus on three main methods of visualization. For each of these methods, you need to pick between 1-3 processors based on the part. As with Milestone 1, you will need to talk in this README about why you picked the processors you did (for one part, it is going to be painfully obvious). Overall, you should aim to use all five processors by the end of this part of the lab, however _YOU DO NOT NEED TO USE ALL FIVE FOR EACH PART_.
+# MSP430FR6989 Simple LCD Driver
+This library is meant to make writing simple characters to the on-board LCD display of the MSP430FR6989 Launchpad simple.
 
-## RGB LED
-Hopefully by this point you are fairly comfortable with how to control an RGB LED. To ease into this lab, you should take your sensors and have them correlate to the color, brightness, blinking speed, etc. of an RGB LED. If for your resistive sensor you picked a thermistor, it might make sense to have the RGB change from a "Blue" color to a "Red" color as it heats up. For this, you should pick 3 processors to perform this on. You do not need to use all three sensors on each of the boards. Pick one sensor per board and work off of that.
+## Dependencies
+* msp430.h
+This header file must be called before calling this one, otherwise you might get errors with certain macros not being defined. 
 
-## LCD Display
-Now that you are getting sensor data and acting on it, why don't you actually try to display the information the user in actual numbers. Using the MSP430FR6989, convert the information from all three of your sensors to a human readable value on the on-board LCD. Fair warning, *DO NOT TRY TO REINVENT THE WHEEL*. Make sure you give the resource explorer a good looking through to see what TI is going to provide you.
+### Including the library
+All you need to do is add the LCDDriver.c and LCDDriver.h files to your project and in the first few lines of your main file, you need to include the new .h file.
+```c
+#include <msp430.h>
+#include "LCDDriver.h"
+```
 
-## PC Visualization
-While UART is awesome for talking between processors, it also can be used to stream data back to your computer which you can use software to read. If you want to be adventurous (or if you have experiences in other languages like Python or Java) you can try to make your own visualization software for looking at the sensor data. Instead of that, you need to be able to collect and visualize data through MATLAB using the "Serial Toolbox". It is up to you to figure out how fancy you want your plots to be, but at a minimum, your processor needs to be able to communicate back to MATLAB and you need to be able to plot the data over time back on your laptop. Since this is all UART, I would expect you to do this for at least two processors.
+## Usage
 
-## Now its your turn
-For the finale of this lab, pick a processor and run at least two of these visualizations at the same time. You also should look at using multiple channels on the internal ADC, although this is not required.
+### Functions
+Currently, this library supports one main function which takes in an ASCII Alphanumeric character or space and displays it on the corresponding LCD segment.
+```c
+showChar(char c, int position)
+```
+#### Inputs
++ c is the input ASCII Character which you want to display ('A-Z', 'a-z', '0-9', ' ')
++ position is which LCD digit you want to put the character on starting with 1 on the left and 6 on the right.
 
+#### Outputs
+If you have a character within the accepted range of ASCII characters, you should see that character pop up on the screen after this line of code is called. If an ASCII character not within the range is passed in, it will turn all segments of that particular digit on to indicate an error. Please reference the [MSP430FR6989 Launch Pad Data Sheet](http://www.ti.com/lit/ug/slau627a/slau627a.pdf) for more information about which registers are being controlled in this library.
 
-## Deliverables
-For this part of the lab, you need to be able to organize your submissions based on the part of the lab it is fulfilling. If this means using a ton of folders, be my guest, but at the end of the day, I am going to be grading these as if I am someone coming to your repository for information. This whole part can be summarized in one large README which should be *HEAVILY* focused on how to actually implement and use your code. 
+### Example
+If you wanted to show whatever character you just received over a UART communication on the right most digit (Digit 6) of the LCD, you could simply add showChar() to your UART ISR.
+```c
+#pragma vector=USCI_A0_VECTOR
+__interrupt void USCI_A0_ISR(void)
+{
+  switch(__even_in_range(UCA0IV,USCI_UART_UCTXCPTIFG))
+  {
+    case USCI_NONE: break;
+    case USCI_UART_UCRXIFG:
+      while(!(UCA0IFG&UCTXIFG));
+      UCA0TXBUF = UCA0RXBUF;    // Echo back the character received
+      showChar((UCA0RXBUF & 0x00FF), 6);  // Truncate and Display Character on LCD Digit 6
+      break;
+    case USCI_UART_UCTXIFG: break;
+    case USCI_UART_UCSTTIFG: break;
+    case USCI_UART_UCTXCPTIFG: break;
+    default: break;
+  }
+}
+```
+
+## Copyright Disclaimer
+```c
+/* --COPYRIGHT--,BSD_EX
+ * Copyright (c) 2014, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *******************************************************************************
+ *
+ *                       MSP430 CODE EXAMPLE DISCLAIMER
+ *
+ * MSP430 code examples are self-contained low-level programs that typically
+ * demonstrate a single peripheral function or device feature in a highly
+ * concise manner. For this the code may rely on the device's power-on default
+ * register values and settings such as the clock configuration and care must
+ * be taken when combining code from several examples to avoid potential side
+ * effects. Also see www.ti.com/grace for a GUI- and www.ti.com/msp430ware
+ * for an API functional library-approach to peripheral configuration.
+ *
+ * --/COPYRIGHT--*/
+```
