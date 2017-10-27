@@ -1,10 +1,15 @@
 # PCB Design
-Since we are getting closer to building realistic systems in your final projects, you will most likely need to build a PCB so that you are not worrying about carrying around a rat's nest of wires. Really, the basics of PCB design are quite simple: make a schematic to lay out what components need to be connected to each other, then import the schematic to a PCB designer and physically connect the components together. Where the difficulty comes in is in the tedium. For low-frequency, low power applications, you should be able to get away with pretty much anything you do. 
 
-As the semester progresses we will be dealing with more applications which will require you to build boards with higher signal integrity and power carrying capabilities, but we will cross that bridge when we get to it.
+|Value|Quantity|Name|RefDes| Manufacturer | Supplier |
+| :---: | :---: | :--- | :---: | :---: | :--- |
+|1u|1|CAP_0805|C1| Vishay | https://www.mouser.com/ProductDetail/Vishay-Vitramon/VJ0805Y105KXQTW1BC/?qs=sGAEpiMZZMsh%252b1woXyUXj7IM2igjA789UFrvf0Kziow%3d |
+|0.01u|1|CAP_0805|C2| Wurth Electronic | https://www.mouser.com/ProductDetail/Wurth-Electronics/885012207011/?qs=sGAEpiMZZMs0AnBnWHyRQEGbLOF2VP1iH7zxtaPhTpObVhmDSZ4o9Q%3d%3d |
+|0.01u|1|CAP_0805|C3| Wurth Electronic | https://www.mouser.com/ProductDetail/Wurth-Electronics/885012207011/?qs=sGAEpiMZZMs0AnBnWHyRQEGbLOF2VP1iH7zxtaPhTpObVhmDSZ4o9Q%3d%3d |
+||1|644456-8|J1| Omron Electonics | https://www.mouser.com/ProductDetail/Omron-Electronics/XG8V-0831/?qs=sGAEpiMZZMs%252bGHln7q6pm%252bv5BXf4QdrTUprKlfXrIZ0%3d |
+||1|644456-8|J2| Omron Electonics | https://www.mouser.com/ProductDetail/Omron-Electronics/XG8V-0831/?qs=sGAEpiMZZMs%252bGHln7q6pm%252bv5BXf4QdrTUprKlfXrIZ0%3d |
+|1k|1|RES_0805|R1| Yageo | https://www.mouser.com/ProductDetail/Yageo/RC0805FR-071KL/?qs=sGAEpiMZZMtlubZbdhIBINUJ4p5cMnF1Rv8sEVwr4ss%3d |
+||1|MSP430FR2311PW16R|U1| Texas Instruments | https://www.mouser.com/ProductDetail/Texas-Instruments/MSP430FR2311IPW16R/?qs=sGAEpiMZZMvzNxwKcL67%252bslf58yKv5kzj7hMAPyboDs%3d |
 
-## Task
-You will be required to design a simple breakout board for the MSP430FR2311. This is one of the simplest processors you have to design for, requiring you to only place a few capacitors to get it to work. You might think wait, but isn't there all that stuff up at the top of the board? Don't we need to also include that? All of those parts are part of the programmer/debugger and it is very easy to program your chip using just a few wires.
 
 ## Deliverables 
 This folder should contain the following files:
