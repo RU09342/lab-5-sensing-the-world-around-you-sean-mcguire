@@ -1,14 +1,14 @@
 #include <msp430.h>
 
 unsigned int ADC_Result;
-void Init_GPIO();
+void PrepGPIO();
 
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;                                // Stop WDT
 
     //Configure LEDs
-    Init_GPIO();
+    PrepGPIO();
     P1DIR |= BIT0;
     P1OUT &= ~BIT0;
     P2DIR |= BIT0;
@@ -101,15 +101,16 @@ void __attribute__ ((interrupt(ADC_VECTOR))) ADC_ISR (void)
             break;
         case ADCIV_ADCIFG:
             ADC_Result = ADCMEM0;
-            UCA0TXBUF = (ADC_Result & 0xFF);
-            __bic_SR_register_on_exit(LPM0_bits);            // Clear CPUOFF bit from LPM0
+            UCA0TXBUF = (ADC_Result & 0xFF00);				// Send MSBs
+            UCA0TXBUF = (ADC_Result & 0x00FF);				// Send LSBs
+            __bic_SR_register_on_exit(LPM0_bits);			// Clear CPUOFF bit from LPM0
             break;
         default:
             break;
     }
 }
 
-void Init_GPIO()
+void PrepGPIO()
 {
     P1DIR = 0xFF; P2DIR = 0xFF;
     P1REN = 0xFF; P2REN = 0xFF;
