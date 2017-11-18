@@ -101,7 +101,7 @@ void __attribute__ ((interrupt(ADC_VECTOR))) ADC_ISR (void)
             break;
         case ADCIV_ADCIFG:
             ADC_Result = ADCMEM0;
-            UCA0TXBUF = (ADC_Result & 0xFF00);				// Send MSBs
+            UCA0TXBUF = (ADC_Result >> 8);					// Send MSBs
             UCA0TXBUF = (ADC_Result & 0x00FF);				// Send LSBs
             __bic_SR_register_on_exit(LPM0_bits);			// Clear CPUOFF bit from LPM0
             break;
