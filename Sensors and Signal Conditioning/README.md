@@ -29,7 +29,7 @@ Unlike the last two devices, the LM35 is a temperature sensor. The LM35 outputs 
 </p>
   
 ## Analog to Digital Converter (ADC)
-The ADC is the part of the microprocessor that converts analog data into digital data that can be processed by the microprocessor. It represents the analog voltage read as some fraction of V<sub>DD</sub>. Basically the voltage read in is equal to VDD(ADCxMEMy)/2<sup>x</sup> where x is the resolution (number of bits) of the ADC.
+The ADC is the part of the microprocessor that converts analog data into digital data that can be processed by the microprocessor. It represents the analog voltage read as some fraction of V<sub>DD</sub>. Basically the voltage read in is equal to V<sub>DD</sub>(ADCxMEMy)/2<sup>x</sup> where x is the resolution (number of bits) of the ADC.
 
 The code for the FR2311 is just simple code to transmit an ADC reading over UART. Basically, the ADC is set up to take continuous measurements. Every time the ADC is finished converting a measurement to its binary representation, the ADC triggers an interrupt. In the interrupt service routine for the ADC, the value in ADC10MEM0 is saved to an integer value in memory. Because UART can only transmit 8 bits at a time, the 10-bit ADC reading has to be sent out in parts. In order to send the most significant bits, we shift the number to the right by 8. To send the least sigificant bits, we AND the integer with 0xFF. Both of these values are then sent to the TX buffer. Lastly, the microprocessor goes back into low power mode until the ADC triggers another interrupt.
 
